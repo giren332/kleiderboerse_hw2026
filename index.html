@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kleiderb&ouml;rse H/W 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f7f5ff;padding:24px 16px;min-height:100vh;color:#2d2d2d;}
+.app{max-width:820px;margin:0 auto;}
+h1{font-size:22px;font-weight:700;color:#1a1a2e;letter-spacing:-0.02em;}
+.header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:28px;flex-wrap:wrap;}
+.counter{background:#fff;border-radius:12px;padding:8px 16px;border:1.5px solid #e8e4f3;font-size:13px;color:#4a4080;font-weight:500;white-space:nowrap;}
+.sub{font-size:13px;color:#888;margin-top:3px;}
+.card{background:#fff;border-radius:14px;border:1.5px solid #e8e4f3;padding:20px 24px;margin-bottom:14px;}
+.section-label{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;}
+
+/* Timeline */
+.phase-row{display:flex;align-items:stretch;cursor:pointer;}
+.tl-col{width:32px;display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.tl-dot{width:16px;height:16px;border-radius:50%;background:#fff;border:2.5px solid #ccc;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700;}
+.tl-line{width:2px;flex:1;background:#e8e4f3;margin-top:2px;}
+.phase-card{flex:1;margin-left:12px;margin-bottom:12px;background:#faf9fe;border:1.5px solid #e8e4f3;border-radius:12px;padding:12px 14px;transition:background .15s;}
+.phase-card:hover{background:#f4f1fd;}
+.phase-meta{display:flex;align-items:center;gap:8px;margin-bottom:3px;}
+.phase-summary{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:6px;}
+.phase-group-line{font-size:11.5px;margin-bottom:2px;line-height:1.5;}
+.phase-pct{font-size:20px;font-weight:700;line-height:1;}
+.prog-mini{height:3px;background:#ece8f8;border-radius:99px;overflow:hidden;margin-top:10px;}
+.prog-mini-fill{height:100%;border-radius:99px;transition:width .3s;}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.tab-btn{font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;border:1.5px solid #e8e4f3;background:#fff;color:#666;font-family:inherit;transition:all .15s;}
+.tab-btn:hover{background:#f4f1fd;}
+
+/* Detail */
+.detail-title{font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:2px;}
+.detail-sub{font-size:13px;color:#888;margin-bottom:18px;}
+.prog-row{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.prog-pill{border-radius:12px;padding:6px 14px;font-size:13px;font-weight:600;flex-shrink:0;}
+.prog-bar{flex:1;height:6px;background:#f0edf9;border-radius:99px;overflow:hidden;}
+.prog-bar-fill{height:100%;border-radius:99px;transition:width .3s;}
+.prog-count{font-size:12px;color:#888;white-space:nowrap;}
+
+/* Groups */
+.group-block{margin-bottom:14px;border-radius:12px;border:1.5px solid #f0edf9;overflow:hidden;}
+.group-hdr{border-bottom:1.5px solid #f0edf9;padding:9px 12px;display:flex;align-items:center;gap:8px;}
+.group-title-inp{border:none;background:transparent;font-size:11px;font-weight:700;letter-spacing:.07em;outline:none;font-family:inherit;padding:1px 0;flex-shrink:0;width:170px;}
+.group-sep{opacity:.4;flex-shrink:0;}
+.group-bullet-inp{flex:1;border:none;background:transparent;font-size:12px;color:#555;outline:none;font-family:inherit;line-height:1.5;padding:1px 0;}
+.group-bullet-inp:focus{color:#1a1a2e;}
+.group-rm{background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;padding:0 2px;flex-shrink:0;line-height:1;}
+.todos-area{padding:8px 8px 10px;}
+
+/* Todo rows */
+.todo-row{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:8px;margin-bottom:2px;transition:background .15s;position:relative;}
+.todo-row:hover{background:#faf9fe;}
+.todo-row.done-row{background:#f4f1fd;}
+.checkbox{width:18px;height:18px;border-radius:5px;border:2px solid #ccc;background:#fff;flex-shrink:0;margin-top:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:11px;color:#fff;font-weight:700;user-select:none;}
+.todo-content{flex:1;min-width:0;}
+.todo-text-span{font-size:13.5px;color:#2d2d2d;line-height:1.5;cursor:text;display:block;word-break:break-word;}
+.todo-text-span.done{color:#aaa;text-decoration:line-through;}
+.todo-text-inp{width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-size:13.5px;color:#2d2d2d;outline:none;font-family:inherit;padding:1px 2px;}
+.owner-pill{display:inline-block;margin-top:4px;font-size:11px;border-radius:20px;padding:2px 9px;cursor:pointer;font-weight:500;}
+.owner-pill:hover{opacity:.75;}
+.owner-pill.empty{color:#ccc;background:#f5f5f5;font-style:italic;}
+.owner-inp{border:none;border-bottom:1.5px solid #ccc;background:transparent;font-size:11px;outline:none;font-family:inherit;padding:1px 3px;margin-top:4px;width:150px;}
+.todo-btns{display:none;gap:2px;flex-shrink:0;margin-top:2px;}
+.todo-row:hover .todo-btns{display:flex;}
+.todo-btn{background:none;border:none;cursor:pointer;color:#bbb;font-size:13px;padding:0 3px;line-height:1;}
+.todo-btn.del{font-size:16px;}
+
+/* Buttons */
+.add-todo-btn{margin-top:5px;margin-left:2px;font-size:12px;background:none;border-style:dashed;border-width:1.5px;border-radius:8px;padding:4px 12px;cursor:pointer;font-family:inherit;}
+.add-group-btn{width:100%;font-size:12px;color:#aaa;background:none;border:1.5px dashed #ddd;border-radius:10px;padding:7px 16px;cursor:pointer;font-family:inherit;margin-bottom:18px;display:block;}
+.add-row-btn{margin-top:8px;font-size:12px;color:#6C5CE7;background:none;border:1.5px dashed #c4b8f5;border-radius:8px;padding:5px 14px;cursor:pointer;font-family:inherit;}
+
+/* Table */
+.tbl-wrap{margin-top:24px;}
+.tbl-title{font-weight:600;font-size:14px;color:#1a1a2e;margin-bottom:3px;}
+.tbl-sub{font-size:12px;color:#888;margin-bottom:8px;}
+.tbl-scroll{overflow-x:auto;border-radius:10px;border:1.5px solid #e8e4f3;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{padding:8px 12px;text-align:left;font-weight:600;color:#4a4080;font-size:12px;border-bottom:1.5px solid #e8e4f3;background:#f4f1fd;white-space:nowrap;}
+td{padding:5px 8px;border-bottom:1px solid #f0edf9;vertical-align:middle;}
+tr:nth-child(even) td{background:#faf9fe;}
+td input{width:100%;border:none;background:transparent;font-size:13px;color:#2d2d2d;outline:none;font-family:inherit;padding:2px 4px;}
+td input:focus{background:#f0edfc;border-radius:4px;}
+td.cat{font-size:11px;font-weight:600;color:#6C5CE7;white-space:nowrap;width:120px;}
+td.cat-repeat{width:120px;}
+
+/* Doc */
+.doc-section{margin-top:24px;}
+.doc-label{font-size:11px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.doc-ta{width:100%;min-height:110px;border:1.5px solid #e8e4f3;border-radius:10px;padding:12px 14px;font-size:13px;color:#2d2d2d;font-family:inherit;line-height:1.6;resize:vertical;outline:none;background:#faf9fe;transition:border-color .15s;}
+
+.footer-note{margin-top:16px;text-align:center;font-size:11px;color:#ccc;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>Kleiderb&ouml;rse H/W 2026</h1>
+      <div class="sub">Planungs-&Uuml;bersicht &middot; B&ouml;rse: 11. Oktober 2026</div>
+    </div>
+    <div class="counter" id="global-counter">0/0 Aufgaben erledigt</div>
+  </div>
+  <div id="app"></div>
+  <div class="footer-note">&Auml;nderungen werden nur f&uuml;r diese Sitzung gespeichert</div>
+</div>
+
+<script>
+const PHASES = [
+  {id:"april",label:"April 2026",date:"Ab 22. April",color:"#6C5CE7",
+   summary:"Erstes Orgateam-Treffen, Freischaltung Basarlino, Planung",
+   groups:[
+    {id:"g_a1",title:"TEAM",bullet:"Abg\u00e4nge kl\u00e4ren \u00b7 Neue Mitglieder \u00b7 Aufgabenverteilung zuweisen",todos:[
+      {id:"a2",text:"Kl\u00e4ren: Wer ist H/W nicht mehr dabei?",owner:"Alle"},
+      {id:"a3",text:"Neue Mitglieder besprechen (Laura v.d. Meer, Michaela Ricker, Irina Kirschmann)",owner:"Alle"},
+      {id:"a12",text:"Aufgabenverteilung H/W 2026 festlegen (Tabelle unten)",owner:"Alle"},
+    ]},
+    {id:"g_a2",title:"INFRASTRUKTUR",bullet:"Basarlino freischalten \u00b7 Saison-Termine festlegen \u00b7 Schl\u00fcssel / Absprachen KiGa + Schule",todos:[
+      {id:"a4",text:"Alle weiteren Termine f\u00fcr die Saison abstimmen und eintragen",owner:"Gina"},
+      {id:"a5",text:"Basarlino freischalten",owner:"Julia C."},
+      {id:"a13",text:"Schl\u00fcssel KiGa + Terminabsprache kl\u00e4ren",owner:"Jana"},
+      {id:"a14",text:"Schl\u00fcssel Schule + Terminabsprache kl\u00e4ren",owner:"Vanessa"},
+    ]},
+    {id:"g_a3",title:"KOMMUNIKATION",bullet:"Instagram ja/nein \u00b7 Plakat \u00fcberarbeiten \u00b7 Plakatliste aktualisieren",todos:[
+      {id:"a6",text:"Instagram-Account ja/nein entscheiden + Verantwortliche benennen",owner:"Alle"},
+      {id:"a7",text:"Neues Plakat erstellen \u2013 Zeiten anpassen (Schwangerenshoppen 9:30)",owner:"Julia K."},
+      {id:"a8",text:"Plakatliste 2026 \u00fcberarbeiten",owner:"Veronika"},
+    ]},
+    {id:"g_a4",title:"FINANZEN",bullet:"Zahlungsart entscheiden \u00b7 Abrechnung: Ablauf best\u00e4tigen",todos:[
+      {id:"a9",text:"Zahlungsart entscheiden: SumUp, Voba-Leihger\u00e4te oder WERO",owner:"Sonja"},
+      {id:"a15",text:"Abrechnung: Ablauf und Verantwortliche best\u00e4tigen",owner:"Sonja + Julia C."},
+    ]},
+    {id:"g_a5",title:"MATERIAL",bullet:"Kennzeichnung Orgateam: Buttons vs. Schal vs. weitere",todos:[
+      {id:"a10",text:"Kennzeichnung Orgateam entscheiden: Buttons vs. Schal vs. weitere",owner:"Laura"},
+    ]},
+   ],
+   table:{title:"Aufgabenverteilung H/W 2026",sub:"Aus FS26 \u00fcbernommen \u2013 bitte anpassen und best\u00e4tigen",
+    cols:["Kategorie","Aufgabe","Verantwortlich","Anmerkung"],
+    rows:[
+      ["Infrastruktur","Basarlino \u2013 Freischaltung","Julia C.",""],
+      ["Infrastruktur","Basarlino \u2013 Kommunikation","Julia C.",""],
+      ["Infrastruktur","Schl\u00fcssel KiGa + Terminabsprache","Jana",""],
+      ["Infrastruktur","Schl\u00fcssel Schule + Terminabsprache","Vanessa",""],
+      ["Finanzen","Kassenvorbereitung","Sonja","mit Theo Elbers"],
+      ["Finanzen","Konto","Sonja",""],
+      ["Finanzen","Abrechnung","Sonja + Julia C.",""],
+      ["Finanzen","Geldumschl\u00e4ge verteilen + abhaken","Kimy + Laura",""],
+      ["Aufbau","Donnerstag Minigolf","Pia (Sprinter)","Absprache Norbert \u2192 Laura"],
+      ["Aufbau","Donnerstag Bunker","Laura (Sprinter)",""],
+      ["Aufbau","Irrland (Sachen abholen)","Veronika",""],
+      ["Helfer","Helferliste","Julia K.",""],
+      ["Helfer","Postkiste / Drucker / Ordner-Abrechnung","Julia K.",""],
+      ["Helfer","Basarlino Abrechnung","Julia K.",""],
+      ["Essen/Trinken","Eink\u00e4ufe Cafeteria (Tabletts, Einschlagpapier, Zucker, Milch)","Marion",""],
+      ["Essen/Trinken","Laugengeb\u00e4ck","Marion / Yalini",""],
+      ["Essen/Trinken","Schnaps","Gina",""],
+      ["Essen/Trinken","Nach B\u00f6rse: Pizza bestellen","Vanessa",""],
+      ["Kommunikation","Plakatliste","Veronika",""],
+      ["Kommunikation","\u00d6ffentlichkeitsarbeit (App / Presse / Facebook / Stadt)","Veronika",""],
+      ["Kommunikation","Orga-Team Kommunikation","Gina",""],
+      ["Kommunikation","Instagram-Account","???","noch offen"],
+      ["Material","Kennzeichnung Orgateam: Buttons vs. Schal vs. weitere","Laura",""],
+      ["R\u00e4ume","Flur (Aufbau)","Gina + Julia",""],
+      ["R\u00e4ume","Raum: Baby","Jana + Marion",""],
+      ["R\u00e4ume","Raum: Schwangere","Julia C.",""],
+      ["R\u00e4ume","Raum: kleine Gr\u00f6\u00dfen","Kimy + Laura",""],
+      ["R\u00e4ume","Raum: gro\u00dfe Gr\u00f6\u00dfen","Vanessa + Pia",""],
+      ["R\u00e4ume","Raum: Spielzeug","Veronika",""],
+    ]}},
+  {id:"juni",label:"Juni 2026",date:"Vor den Sommerferien",color:"#00B894",
+   summary:"Regeln \u00fcberarbeiten, Erinnerungsmail, Plakate verteilen",
+   groups:[
+    {id:"g_j1",title:"VERK\u00c4UFER",bullet:"Basarlino-Regeln \u00fcberarbeiten \u00b7 Erinnerungsmail versenden \u00b7 E-Mail als Pflichtfeld pr\u00fcfen",todos:[
+      {id:"j1",text:"Regeln f\u00fcr Basarlino \u00fcberarbeiten",owner:"Alle"},
+      {id:"j2",text:"Hinweis auf Eigenverantwortung der Verk\u00e4ufer in Regeln aufnehmen",owner:"Julia C."},
+      {id:"j3",text:"Erinnerungsmail an bestehende Verk\u00e4ufer versenden",owner:"Julia C."},
+      {id:"j7",text:"Externe Helfer: E-Mail als Pflichtfeld in Basarlino pr\u00fcfen",owner:"Julia C."},
+    ]},
+    {id:"g_j2",title:"\u00d6FFENTLICHKEIT",bullet:"Plakate drucken \u00b7 Plakate verteilen \u00b7 Social Media / Presse ansto\u00dfen",todos:[
+      {id:"j4",text:"Plakate drucken",owner:"Julia K."},
+      {id:"j5",text:"Plakate verteilen nach Liste",owner:"Alle lt. Liste"},
+      {id:"j8",text:"Social Media / Presse ansto\u00dfen",owner:"Veronika"},
+    ]},
+    {id:"g_j3",title:"HELFER",bullet:"Helferliste \u00f6ffnen \u00b7 Bonus-Regelung kommunizieren \u00b7 Schichten kommunizieren",todos:[
+      {id:"j6",text:"Helferliste \u00f6ffnen und Bonus-Regelung kommunizieren",owner:"Julia K."},
+      {id:"j9",text:"Schichten an alle Helfer kommunizieren",owner:"Julia K."},
+    ]},
+   ],
+   table:{title:"Plakate-Verteilung \u2013 Status",sub:"Aus Plakatliste 2026 \u2013 bitte Status eintragen",
+    cols:["Ort","Verantwortlich","Verteilt?"],
+    rows:[
+      ["KiGa St. Antonius","Jana",""],["KiGa Sterntaler","Jana (Wido)",""],["KiGa Urbanus","Jana (Wido)",""],
+      ["Dr. Kaiser","Jana",""],["Dr. Lommen","Jana",""],["KiGa Broeckhof","Jana",""],
+      ["Jugendamt/Sozialamt","Julia Kaenders",""],["Tafel","Julia K.",""],["Dr. Sch\u00fcrmann","Julia K.",""],
+      ["KiGa Wiesenzauber","Julia K.",""],["KiGa Lebenshilfe","Julia K.",""],["Sportplatz Twisteden","Julia K.",""],
+      ["Dr. Zengin","Julia C.",""],["B\u00fccherei","Julia C.",""],["Pfarrheim Twisteden","Julia C.",""],
+      ["Turnhalle Twisteden","Julia C.",""],["Breuer","Julia C.",""],["Fr\u00fchf\u00f6rderstelle","Julia D.",""],
+      ["KiGa St. Marien","Julia D.",""],["KiGa Wetten","Julia D.",""],["Pfeffergrill","Julia D.",""],
+      ["Fitnessstudio Straelen","Kimy",""],["Buchhandlung Bercker","Laura",""],["Buchhandlung Aengenheyster","Laura",""],
+      ["Edeka Twisteden vorne","Laura",""],["Metzger Twisteden","Laura",""],["Lenas Haarwerk","Laura",""],
+      ["Sparkasse Kevelaer","Laura",""],["Minigolf","Laura",""],["Voba Kevelaer","Laura",""],["Irrland","Laura",""],
+      ["Freibad Walbeck","Vanessa",""],["KiGa Straelen","Vanessa",""],["KiGa Twisteden","Vanessa",""],
+      ["KiGa + B\u00e4ckerei Walbeck","Vanessa",""],["Dr. Burgraf","Vanessa",""],["Dr. Starke","Vanessa",""],
+      ["SchnippSchnapp","Vanessa",""],["B\u00e4ckerei Twisteden","Vanessa",""],["Voba Twisteden","Vanessa",""],
+      ["KiGa Wemb","Sonja",""],["KiGa St. Franziskus Weeze","Sonja",""],["KiGa Cyriakus Weeze","Sonja",""],
+      ["KiGa Bullerb\u00fc Weeze","Sonja",""],["KiGa Hubertus Wemb","Sonja",""],["Wemb Edeka","Sonja",""],
+      ["Niederrhein Museum","Veronika",""],["Dr. Halbach","Denise",""],["Dr. Dreher","Denise",""],
+      ["KH Geldern Infotafel","Denise",""],["Stadtwerke Geldern","Denise",""],["Marion-Standort","Marion",""],
+    ]}},
+  {id:"sept",label:"September 2026",date:"4\u20136 Wochen vor B\u00f6rse",color:"#e6a817",
+   summary:"Etikettier-Treffen, Helferliste f\u00fcllen, letzte Eintragungen",
+   groups:[
+    {id:"g_s1",title:"VERK\u00c4UFER-ABSCHLUSS",bullet:"Deadline letzte Eintragung \u00b7 Verk\u00e4ufer ohne Artikel anschreiben \u00b7 Etikettier-Treffen durchf\u00fchren",todos:[
+      {id:"s1",text:"Etikettier-Treffen 1 organisieren und durchf\u00fchren",owner:"Alle"},
+      {id:"s2",text:"Etikettier-Treffen 2 organisieren und durchf\u00fchren",owner:"Alle"},
+      {id:"s3",text:"Etikettier-Treffen 3 (falls n\u00f6tig)",owner:"Alle"},
+      {id:"s4",text:"Deadline: Letzte Eintragung Verk\u00e4ufer (~13. September)",owner:"Julia C."},
+      {id:"s5",text:"Verk\u00e4ufer ohne Artikel anschreiben",owner:"Denise / Julia C."},
+    ]},
+    {id:"g_s2",title:"HELFER-ABSCHLUSS",bullet:"Alle Schichten besetzt? \u00b7 Kuchenspenden best\u00e4tigt? \u00b7 Bonus-Kommunikation abgeschlossen?",todos:[
+      {id:"s6",text:"Helferliste pr\u00fcfen \u2013 sind alle Schichten besetzt?",owner:"Julia K."},
+      {id:"s7",text:"Externe Helfer: E-Mail-Pflichtfeld in Basarlino pr\u00fcfen",owner:"Julia C."},
+      {id:"s8",text:"Kuchenspenden: 25 Spenden best\u00e4tigt?",owner:"Julia K."},
+      {id:"s12",text:"Bonus-Kommunikation abgeschlossen?",owner:"Julia K."},
+    ]},
+    {id:"g_s3",title:"STATUS-CHECK",bullet:"Plakate verteilt? \u00b7 Social Media aktiv? \u00b7 Offene Punkte aus Juni?",todos:[
+      {id:"s9",text:"Plakate vollst\u00e4ndig verteilt? (Checkliste abhaken)",owner:"Veronika"},
+      {id:"s10",text:"Social Media / Presse aktiv?",owner:"Veronika"},
+      {id:"s11",text:"Offene Punkte aus Juni-Treffen durchgehen",owner:"Alle"},
+    ]},
+   ],
+   table:{title:"Schichten-\u00dcbersicht \u2013 Status",sub:"Laut FS26-Protokoll \u2013 bitte Besetzung eintragen",
+    cols:["Kategorie","Schicht","Zeit","Anzahl","Besetzt?"],
+    rows:[
+      ["Aufbau","Aufbau M\u00e4nner Freitag","14:45\u201316:00","4 FL + 4 Helfer",""],
+      ["Aufbau","Aufbau Freitag","16:00\u201318:30","22 Helfer",""],
+      ["Aufbau","K\u00f6rbe bringen","16:00\u201317:00","Verk\u00e4ufer",""],
+      ["Aufbau","Helfershoppen","18:30\u201320:00","Helfer-Bonus",""],
+      ["B\u00f6rse","Cafeteria Sonntag","09:00\u201312:30","Tanja + Mia",""],
+      ["B\u00f6rse","Kuchenspenden","09:30\u201310:30","25 Spenden",""],
+      ["B\u00f6rse","Verkauf Sonntag","09:15\u201312:30","8 Helfer",""],
+      ["Abbau","Aufr\u00e4umen Sonntag","12:30\u201315:30","18 Helfer",""],
+      ["Abbau","Abbau M\u00e4nner Sonntag","14:00\u201315:30","4 FL + 4 Helfer",""],
+      ["Abbau","K\u00f6rbe abholen","15:30\u201316:00","Verk\u00e4ufer",""],
+    ]}},
+  {id:"letztes",label:"27. Sept. 2026",date:"Letztes Treffen \u2013 2 Wochen vorher",color:"#E17055",
+   summary:"Finale Planung, Essen/Trinken, Einkaufsliste, Raumverteilung",
+   groups:[
+    {id:"g_l1",title:"PERSONAL & R\u00c4UME",bullet:"Raumverteilung best\u00e4tigen \u00b7 Schl\u00fcssel\u00fcbergabe \u00b7 Alle Aufgaben zugewiesen?",todos:[
+      {id:"l1",text:"Alle offenen Aufgaben final zugewiesen?",owner:"Alle"},
+      {id:"l8",text:"Raumverteilung Sonntag best\u00e4tigen",owner:"Alle"},
+      {id:"l9",text:"Schl\u00fcssel\u00fcbergabe KiGa best\u00e4tigen",owner:"Jana"},
+      {id:"l9b",text:"Schl\u00fcssel\u00fcbergabe Schule best\u00e4tigen",owner:"Vanessa"},
+    ]},
+    {id:"g_l2",title:"ESSEN/TRINKEN & MATERIAL",bullet:"Packliste durchgehen \u00b7 Einkauf Cafeteria \u00b7 Laugengeb\u00e4ck \u00b7 Liste finalisieren",todos:[
+      {id:"l3",text:"Cafeteria-Tasche packen: Tortenheber + gr. Messer (KiGa)",owner:"Marion"},
+      {id:"l4",text:"Kaffeemaschine/-pumpe best\u00e4tigen",owner:"Laura"},
+      {id:"l5",text:"2 Thermoskannen best\u00e4tigen",owner:"Julia K. / Julia C."},
+      {id:"l6a",text:"Einkauf Cafeteria: Tabletts, Einschlagpapier, Zucker, Milch",owner:"Marion"},
+      {id:"l6b",text:"Laugengeb\u00e4ck organisieren",owner:"Marion / Yalini"},
+    ]},
+    {id:"g_l3",title:"TECHNIK & KASSE",bullet:"Kassenger\u00e4t einsatzbereit? \u00b7 Kassenstandort best\u00e4tigen \u00b7 Raumschilder drucken",todos:[
+      {id:"l10",text:"Kasse einsatzbereit? Standort OGS (alter Schulausgang) best\u00e4tigen",owner:"Sonja"},
+      {id:"l11",text:"Neue Raumschilder drucken (Schwimmsachen, alle Gruppen)",owner:"Julia K."},
+    ]},
+    {id:"g_l4",title:"ABLAUF-CHECK",bullet:"Zeitplan durchgehen \u00b7 Helfer informiert? \u00b7 Pizza bestellen",todos:[
+      {id:"l13",text:"Zeitplan Freitag + Sonntag nochmals durchgehen",owner:"Alle"},
+      {id:"l14",text:"Alle Helfer \u00fcber Ablauf und Schichten informiert?",owner:"Julia K."},
+      {id:"l12",text:"Nach B\u00f6rse: Pizza bestellen",owner:"Vanessa"},
+    ]},
+   ],table:null},
+  {id:"borse",label:"11. Okt. 2026",date:"B\u00f6rsentag",color:"#D63031",
+   summary:"Do: Minigolf/Bunker \u00b7 Fr: Aufbau \u00b7 So: B\u00f6rse + Nachbesprechung",
+   groups:[
+    {id:"g_b1",title:"DONNERSTAG AUFBAU",bullet:"Minigolf \u00b7 Bunker",todos:[
+      {id:"b1",text:"Minigolf aufgebaut",owner:"Pia (Sprinter)"},
+      {id:"b2",text:"Bunker aufgebaut",owner:"Laura (Sprinter)"},
+    ]},
+    {id:"g_b2",title:"FREITAG AUFBAU",bullet:"14:30 Orgateam \u00b7 14:45 M\u00e4nner \u00b7 16:00 Hauptaufbau + K\u00f6rbe \u00b7 18:30 Helfershoppen",todos:[
+      {id:"b3",text:"Fr 14:30: Orgateam vollst\u00e4ndig",owner:"Alle"},
+      {id:"b4",text:"Fr 14:45: Aufbau M\u00e4nner gestartet",owner:"4 FL + 4 Helfer"},
+      {id:"b5",text:"Fr 16:00: Aufbau Freitag gestartet",owner:"22 Helfer"},
+      {id:"b6",text:"Fr 16:00: K\u00f6rbe-Annahme l\u00e4uft",owner:"Denise + Sonja"},
+      {id:"b7",text:"Fr 18:30: Helfershoppen ge\u00f6ffnet",owner:"Alle"},
+    ]},
+    {id:"g_b3",title:"SONNTAG B\u00d6RSE",bullet:"8:45 Orgateam \u00b7 9:00 Cafeteria \u00b7 9:15 Schwangerenshoppen \u00b7 9:30 Kuchen \u00b7 10:00 Verkauf \u00b7 12:30 Aufr\u00e4umen \u00b7 14:00 Abbau \u00b7 15:30 K\u00f6rbe",todos:[
+      {id:"b8",text:"So 8:45: Orgateam vor Ort",owner:"Alle"},
+      {id:"b9",text:"So 9:00: Cafeteria bereit",owner:"Tanja + Mia"},
+      {id:"b10",text:"So 9:15: Schwangerenshoppen ge\u00f6ffnet",owner:"Julia C."},
+      {id:"b11",text:"So 9:30: Kuchenspenden-Annahme",owner:"25 Spenden"},
+      {id:"b12",text:"So 10:00: Verkauf ge\u00f6ffnet",owner:"8 Helfer"},
+      {id:"b13",text:"So 12:30: Aufr\u00e4umen gestartet",owner:"18 Helfer"},
+      {id:"b14",text:"So 15:30: K\u00f6rbe-Abholung",owner:"Alle"},
+    ]},
+    {id:"g_b4",title:"ABSCHLUSS",bullet:"16:30 Pizza + Nachbesprechung \u00b7 Protokoll \u00b7 Lessons Learned",todos:[
+      {id:"b15",text:"So 16:30: Pizza + Nachbesprechung",owner:"Alle"},
+      {id:"b16",text:"Protokoll der Nachbesprechung erstellen",owner:"Marion"},
+      {id:"b17",text:"Lessons Learned festhalten und teilen",owner:"Alle"},
+    ]},
+   ],table:null},
+  {id:"nach",label:"Oktober/November",date:"So schnell wie m\u00f6glich danach",color:"#5a9fd4",
+   summary:"Abrechnung, Essen gehen, Geldverteilung, N\u00e4chste Saison vormerken",
+   groups:[
+    {id:"g_n1",title:"FINANZEN",bullet:"Abrechnung abschlie\u00dfen \u00b7 Geldumschl\u00e4ge verteilen \u00b7 Spielgruppe + Minigarde auszahlen",todos:[
+      {id:"n1",text:"Abrechnung abschlie\u00dfen",owner:"Sonja + Julia C. + Julia K."},
+      {id:"n2",text:"Geldumschl\u00e4ge an Verk\u00e4ufer verteilen + abhaken",owner:"Kimy + Laura"},
+      {id:"n3",text:"Geld f\u00fcr Spielgruppe \u00fcbergeben",owner:"Marion \u2192 Christina"},
+      {id:"n4",text:"Geld Tanzgruppe Minigarde ber\u00fccksichtigt?",owner:"Sonja"},
+    ]},
+    {id:"g_n2",title:"TEAM & REFLEXION",bullet:"Essen zur Verabschiedung \u00b7 Protokoll erstellen \u00b7 Lessons Learned",todos:[
+      {id:"n5",text:"Essen gehen zur Verabschiedung",owner:"Alle"},
+      {id:"n6",text:"Protokoll Nachbesprechung erstellen und teilen",owner:"Marion"},
+      {id:"n8",text:"Lessons Learned dokumentieren f\u00fcr n\u00e4chste Saison",owner:"Alle"},
+    ]},
+    {id:"g_n3",title:"AUSBLICK",bullet:"Termin F/S 2027 festlegen \u00b7 Personelle \u00c4nderungen vormerken",todos:[
+      {id:"n7",text:"Termin F/S 2027 vorl\u00e4ufig festlegen",owner:"Gina"},
+      {id:"n9",text:"Personelle \u00c4nderungen f\u00fcr n\u00e4chste Saison vormerken",owner:"Alle"},
+    ]},
+   ],table:null},
+];
+
+// \u2500\u2500 State \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+const S = { view:"overview", activeId:null, todos:{}, groups:{}, notes:{}, tableRows:{} };
+
+PHASES.forEach(p => {
+  S.notes[p.id] = "";
+  S.groups[p.id] = p.groups.map(g => ({ ...g, todos: g.todos.map(t => ({ ...t, done: false })) }));
+  if (p.table) S.tableRows[p.id] = p.table.rows.map(r => [...r]);
+  p.groups.forEach(g => g.todos.forEach(t => { S.todos[t.id] = false; }));
+});
+
+// \u2500\u2500 Helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function cleanBullet(b) { return b.replace(/\s*\([^)]*\)/g,"").replace(/\s*\u2192\s*\S+/g,"").replace(/\s*\u00b7\s*\u00b7/g," \u00b7").replace(/^\s*\u00b7\s*/g,"").trim(); }
+function getTodos(pid) { return S.groups[pid].flatMap(g => g.todos); }
+function getProgress(pid) { const all = getTodos(pid); const done = all.filter(t => S.todos[t.id]).length; return { done, total: all.length, pct: all.length ? Math.round(done/all.length*100) : 0 }; }
+function globalProg() { let d=0,t=0; PHASES.forEach(p => { const pr=getProgress(p.id); d+=pr.done; t+=pr.total; }); return {done:d,total:t}; }
+function updateCounter() { const g=globalProg(); document.getElementById("global-counter").textContent=g.done+"/"+g.total+" Aufgaben erledigt"; }
+
+// \u2500\u2500 Render Overview \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function renderOverview() {
+  updateCounter();
+  let html = '<div class="card"><div class="section-label">Zeitleiste</div>';
+  PHASES.forEach((phase, idx) => {
+    const pr = getProgress(phase.id);
+    const isLast = idx === PHASES.length - 1;
+    html += `<div class="phase-row" onclick="openPhase('${phase.id}')">
+      <div class="tl-col">
+        <div class="tl-dot" style="border-color:${phase.color};background:${pr.pct===100?phase.color:'#fff'}">${pr.pct===100?'\u2713':''}</div>
+        ${!isLast?'<div class="tl-line"></div>':''}
+      </div>
+      <div class="phase-card" style="border-left:3px solid ${phase.color};${isLast?'margin-bottom:0':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div style="flex:1">
+            <div class="phase-meta">
+              <span style="font-size:12px;font-weight:600;color:${phase.color}">${phase.label}</span>
+              <span style="color:#aaa;font-size:11px">\u00b7</span>
+              <span style="font-size:12px;color:#888">${phase.date}</span>
+            </div>
+            <div class="phase-summary">${phase.summary}</div>
+            <div>`;
+    S.groups[phase.id].forEach(g => {
+      html += `<div class="phase-group-line"><span style="font-weight:700;color:${phase.color}">${esc(g.title)}</span>`;
+      if (g.bullet) html += ` <span style="color:#888">\u00b7 ${esc(cleanBullet(g.bullet))}</span>`;
+      html += `</div>`;
+    });
+    html += `</div></div>
+          <div style="text-align:right;flex-shrink:0;min-width:52px">
+            <div class="phase-pct" style="color:${pr.pct===100?phase.color:'#ccc'}">${pr.pct}%</div>
+            <div style="font-size:10px;color:#aaa;margin-top:2px">${pr.done}/${pr.total}</div>
+            <div style="margin-top:6px;font-size:11px;color:${phase.color};font-weight:500">Details \u2192</div>
+          </div>
+        </div>
+        <div class="prog-mini"><div class="prog-mini-fill" style="width:${pr.pct}%;background:${phase.color}"></div></div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById("app").innerHTML = html;
+}
+
+// \u2500\u2500 Render Todo Row \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function renderTodoRow(pid, gi, ti, todo, color) {
+  const done = S.todos[todo.id];
+  const pillStyle = done ? `color:#bbb;background:#f0edf9` : `color:${color};background:${color}18`;
+  return `<div class="todo-row ${done?'done-row':''}" id="tr-${esc(todo.id)}" style="background:${done?'#f4f1fd':'transparent'}">
+    <div class="checkbox" style="border-color:${done?color:'#ccc'};background:${done?color:'#fff'}"
+      onclick="toggleTodo('${pid}',${gi},${ti},'${esc(todo.id)}')">${done?'\u2713':''}</div>
+    <div class="todo-content">
+      <span class="todo-text-span ${done?'done':''}" ondblclick="editText('${pid}',${gi},${ti},'${esc(todo.id)}')">${esc(todo.text)}</span>
+      ${todo.owner
+        ? `<span class="owner-pill" style="${pillStyle}" onclick="editOwner('${pid}',${gi},${ti},'${esc(todo.id)}')" title="Klick zum Bearbeiten">${esc(todo.owner)}</span>`
+        : `<span class="owner-pill empty" onclick="editOwner('${pid}',${gi},${ti},'${esc(todo.id)}')" title="Owner hinzuf\u00fcgen">+ Owner</span>`}
+    </div>
+    <div class="todo-btns">
+      <button class="todo-btn" onclick="editText('${pid}',${gi},${ti},'${esc(todo.id)}')" title="Bearbeiten">\u270e</button>
+      <button class="todo-btn del" onclick="deleteTodo('${pid}',${gi},${ti})" title="L\u00f6schen">\u00d7</button>
+    </div>
+  </div>`;
+}
+
+// \u2500\u2500 Render Detail \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function renderDetail(pid) {
+  const phase = PHASES.find(p => p.id === pid);
+  const pr = getProgress(pid);
+  updateCounter();
+
+  let tabs = `<div class="tabs"><button class="tab-btn" onclick="openOverview()">\u2190 \u00dcbersicht</button>`;
+  PHASES.forEach(p => {
+    const ppr = getProgress(p.id);
+    const active = p.id === pid;
+    tabs += `<button class="tab-btn" onclick="openPhase('${p.id}')"
+      style="${active?`border-color:${p.color};background:${p.color}18;color:${p.color};font-weight:600`:''}">
+      ${p.label} <span style="font-size:10px;opacity:.7">${ppr.done}/${ppr.total}</span></button>`;
+  });
+  tabs += `</div>`;
+
+  let html = tabs + `<div class="card" style="border-top:3px solid ${phase.color};border-color:${phase.color}55">
+    <div class="detail-title">${phase.label}</div>
+    <div class="detail-sub">${phase.summary}</div>
+    <div class="prog-row">
+      <div class="prog-pill" style="background:${phase.color}22;color:${phase.color}">${phase.date}</div>
+      <div class="prog-bar"><div class="prog-bar-fill" id="prog-fill" style="width:${pr.pct}%;background:${phase.color}"></div></div>
+      <div class="prog-count">${pr.done}/${pr.total} erledigt</div>
+    </div>`;
+
+  S.groups[pid].forEach((group, gi) => {
+    html += `<div class="group-block">
+      <div class="group-hdr" style="background:${phase.color}12">
+        <input class="group-title-inp" style="color:${phase.color}" value="${esc(group.title)}"
+          onchange="S.groups['${pid}'][${gi}].title=this.value.toUpperCase()">
+        <span class="group-sep" style="color:${phase.color}">\u00b7</span>
+        <input class="group-bullet-inp" value="${esc(group.bullet)}" placeholder="Agenda-Beschreibung\u2026"
+          onchange="S.groups['${pid}'][${gi}].bullet=this.value">
+        <button class="group-rm" onclick="removeGroup('${pid}',${gi})">\u00d7</button>
+      </div>
+      <div class="todos-area" id="todos-${pid}-${gi}">`;
+    group.todos.forEach((todo, ti) => { html += renderTodoRow(pid, gi, ti, todo, phase.color); });
+    html += `<button class="add-todo-btn" style="color:${phase.color};border-color:${phase.color}55"
+        onclick="addTodo('${pid}',${gi})">+ Aufgabe</button>
+      </div></div>`;
+  });
+
+  html += `<button class="add-group-btn" onclick="addGroup('${pid}')">+ Agenda-Thema hinzuf\u00fcgen</button>`;
+
+  // Table
+  const phaseDef = PHASES.find(p => p.id === pid);
+  if (phaseDef.table) {
+    const rows = S.tableRows[pid] || [];
+    const hasCategory = phaseDef.table.cols[0] === "Kategorie";
+    html += `<div class="tbl-wrap"><div class="tbl-title">${phaseDef.table.title}</div>
+      <div class="tbl-sub">${phaseDef.table.sub}</div>
+      <div class="tbl-scroll"><table><thead><tr>`;
+    phaseDef.table.cols.forEach(c => { html += `<th>${esc(c)}</th>`; });
+    html += `</tr></thead><tbody>`;
+    rows.forEach((row, ri) => {
+      html += `<tr>`;
+      row.forEach((cell, ci) => {
+        const isCat = hasCategory && ci === 0;
+        const sameAsPrev = isCat && ri > 0 && rows[ri][0] === rows[ri-1][0];
+        if (isCat && sameAsPrev) {
+          html += `<td class="cat-repeat"><span style="color:#ddd">\u21b3</span></td>`;
+        } else {
+          html += `<td ${isCat?'class="cat"':''}><input value="${esc(cell)}"
+            style="${isCat?'color:#6C5CE7;font-weight:600;font-size:11px':''}"
+            onchange="S.tableRows['${pid}'][${ri}][${ci}]=this.value"></td>`;
+        }
+      });
+      html += `</tr>`;
+    });
+    html += `</tbody></table></div>
+      <button class="add-row-btn" onclick="addTableRow('${pid}')">+ Zeile hinzuf\u00fcgen</button></div>`;
+  }
+
+  // Documentation
+  html += `<div class="doc-section">
+    <div class="doc-label">Dokumentation</div>
+    <textarea class="doc-ta" placeholder="Beschl\u00fcsse, Notizen, offene Punkte aus diesem Treffen\u2026"
+      onfocus="this.style.borderColor='${phase.color}'" onblur="this.style.borderColor='#e8e4f3'"
+      onchange="S.notes['${pid}']=this.value">${esc(S.notes[pid])}</textarea>
+  </div></div>`;
+
+  document.getElementById("app").innerHTML = html;
+}
+
+// \u2500\u2500 Actions \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function openOverview() { S.view="overview"; S.activeId=null; renderOverview(); }
+function openPhase(pid) { S.view="detail"; S.activeId=pid; renderDetail(pid); }
+
+function toggleTodo(pid, gi, ti, tid) {
+  S.todos[tid] = !S.todos[tid];
+  const todo = S.groups[pid][gi].todos[ti];
+  const color = PHASES.find(p=>p.id===pid).color;
+  const row = document.getElementById("tr-"+tid);
+  if (row) row.outerHTML = renderTodoRow(pid, gi, ti, todo, color);
+  updateCounter();
+  const pr = getProgress(pid);
+  const fill = document.getElementById("prog-fill");
+  if (fill) fill.style.width = pr.pct + "%";
+  const cnt = document.querySelector(".prog-count");
+  if (cnt) cnt.textContent = pr.done+"/"+pr.total+" erledigt";
+}
+
+function editText(pid, gi, ti, tid) {
+  const todo = S.groups[pid][gi].todos[ti];
+  const row = document.getElementById("tr-"+tid);
+  if (!row) return;
+  const span = row.querySelector(".todo-text-span");
+  const color = PHASES.find(p=>p.id===pid).color;
+  const inp = document.createElement("input");
+  inp.className = "todo-text-inp";
+  inp.style.borderBottomColor = color;
+  inp.value = todo.text;
+  span.replaceWith(inp);
+  inp.focus();
+  const commit = () => { todo.text = inp.value; renderDetail(pid); };
+  inp.onblur = commit;
+  inp.onkeydown = e => { if (e.key==="Enter"||e.key==="Escape") commit(); };
+}
+
+function editOwner(pid, gi, ti, tid) {
+  const todo = S.groups[pid][gi].todos[ti];
+  const row = document.getElementById("tr-"+tid);
+  if (!row) return;
+  const pill = row.querySelector(".owner-pill");
+  const color = PHASES.find(p=>p.id===pid).color;
+  const inp = document.createElement("input");
+  inp.className = "owner-inp";
+  inp.style.borderBottomColor = color;
+  inp.value = todo.owner || "";
+  inp.placeholder = "Owner eingeben\u2026";
+  pill.replaceWith(inp);
+  inp.focus();
+  const commit = () => { todo.owner = inp.value; renderDetail(pid); };
+  inp.onblur = commit;
+  inp.onkeydown = e => { if (e.key==="Enter"||e.key==="Escape") commit(); };
+}
+
+function deleteTodo(pid, gi, ti) {
+  const todo = S.groups[pid][gi].todos[ti];
+  delete S.todos[todo.id];
+  S.groups[pid][gi].todos.splice(ti, 1);
+  renderDetail(pid);
+}
+
+function addTodo(pid, gi) {
+  const id = "t_" + Date.now();
+  S.todos[id] = false;
+  S.groups[pid][gi].todos.push({ id, text: "", owner: "" });
+  renderDetail(pid);
+  setTimeout(() => {
+    const todos = S.groups[pid][gi].todos;
+    editText(pid, gi, todos.length-1, todos[todos.length-1].id);
+  }, 30);
+}
+
+function removeGroup(pid, gi) {
+  S.groups[pid][gi].todos.forEach(t => delete S.todos[t.id]);
+  S.groups[pid].splice(gi, 1);
+  renderDetail(pid);
+}
+
+function addGroup(pid) {
+  S.groups[pid].push({ id:"g_"+Date.now(), title:"NEUES THEMA", bullet:"", todos:[] });
+  renderDetail(pid);
+}
+
+function addTableRow(pid) {
+  const phase = PHASES.find(p=>p.id===pid);
+  S.tableRows[pid].push(phase.table.cols.map(()=>""));
+  renderDetail(pid);
+}
+
+// \u2500\u2500 Init \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+renderOverview();
+</script>
+</body>
+</html>
