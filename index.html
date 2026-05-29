@@ -105,10 +105,14 @@ td.cat-repeat{width:120px;}
       <h1>Kleiderb&ouml;rse H/W 2026</h1>
       <div class="sub">Planungs-&Uuml;bersicht &middot; B&ouml;rse: 11. Oktober 2026</div>
     </div>
-    <div class="counter" id="global-counter">0/0 Aufgaben erledigt</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div class="counter" id="global-counter">0/0 Aufgaben erledigt</div>
+      <button onclick="exportState()" title="Aktuellen Stand als JSON exportieren" style="font-size:11px;color:#00B894;background:none;border:1.5px solid #00B89455;border-radius:8px;padding:6px 10px;cursor:pointer;font-family:inherit;">&#8659; Stand exportieren</button>
+      <button onclick="resetAll()" title="Alle gespeicherten Daten zur&uuml;cksetzen" style="font-size:11px;color:#aaa;background:none;border:1.5px solid #e8e4f3;border-radius:8px;padding:6px 10px;cursor:pointer;font-family:inherit;">&#8635; Reset</button>
+    </div>
   </div>
   <div id="app"></div>
-  <div class="footer-note">&Auml;nderungen werden nur f&uuml;r diese Sitzung gespeichert</div>
+  <div class="footer-note">&Auml;nderungen werden automatisch im Browser gespeichert &middot; <span style="cursor:pointer;text-decoration:underline" onclick="resetAll()">Zur&uuml;cksetzen</span></div>
 </div>
 
 <script>
@@ -117,27 +121,28 @@ const PHASES = [
    summary:"Erstes Orgateam-Treffen, Freischaltung Basarlino, Planung",
    groups:[
     {id:"g_a1",title:"TEAM",bullet:"Abg\u00e4nge kl\u00e4ren \u00b7 Neue Mitglieder \u00b7 Aufgabenverteilung zuweisen",todos:[
-      {id:"a2",text:"Kl\u00e4ren: Wer ist H/W nicht mehr dabei?",owner:"Alle"},
-      {id:"a3",text:"Neue Mitglieder besprechen (Laura v.d. Meer, Michaela Ricker, Irina Kirschmann)",owner:"Alle"},
+      {id:"a2",text:"Kl\u00e4ren: Wer ist H/W nicht dabei? Marion, Laura (nur freitags), Julia C. nicht dabei",owner:"Alle"},
+      {id:"a3",text:"Neue Mitglieder besprechen \u2013 werden auch zur B\u00f6rse gefragt",owner:"Alle"},
       {id:"a12",text:"Aufgabenverteilung H/W 2026 festlegen (Tabelle unten)",owner:"Alle"},
     ]},
     {id:"g_a2",title:"INFRASTRUKTUR",bullet:"Basarlino freischalten \u00b7 Saison-Termine festlegen \u00b7 Schl\u00fcssel / Absprachen KiGa + Schule",todos:[
       {id:"a4",text:"Alle weiteren Termine f\u00fcr die Saison abstimmen und eintragen",owner:"Gina"},
-      {id:"a5",text:"Basarlino freischalten",owner:"Julia C."},
+      {id:"a5",text:"Basarlino freischalten \u2013 kleines Treffen Mitte/Ende Juni 2026 (Julia, Julia, Sonja)",owner:"Julia C."},
       {id:"a13",text:"Schl\u00fcssel KiGa + Terminabsprache kl\u00e4ren",owner:"Jana"},
       {id:"a14",text:"Schl\u00fcssel Schule + Terminabsprache kl\u00e4ren",owner:"Vanessa"},
+      {id:"a16",text:"Regeln Basarlino \u00fcberarbeiten",owner:"Alle"},
     ]},
     {id:"g_a3",title:"KOMMUNIKATION",bullet:"Instagram ja/nein \u00b7 Plakat \u00fcberarbeiten \u00b7 Plakatliste aktualisieren",todos:[
-      {id:"a6",text:"Instagram-Account ja/nein entscheiden + Verantwortliche benennen",owner:"Alle"},
-      {id:"a7",text:"Neues Plakat erstellen \u2013 Zeiten anpassen (Schwangerenshoppen 9:30)",owner:"Julia K."},
+      {id:"a6",text:"Instagram-Account: Nein entschieden",owner:"Alle"},
+      {id:"a7",text:"Neues Plakat erstellen \u2013 Zeiten + QR-Code von Freischaltung",owner:"Veronika"},
       {id:"a8",text:"Plakatliste 2026 \u00fcberarbeiten",owner:"Veronika"},
     ]},
     {id:"g_a4",title:"FINANZEN",bullet:"Zahlungsart entscheiden \u00b7 Abrechnung: Ablauf best\u00e4tigen",todos:[
-      {id:"a9",text:"Zahlungsart entscheiden: SumUp, Voba-Leihger\u00e4te oder WERO",owner:"Sonja"},
-      {id:"a15",text:"Abrechnung: Ablauf und Verantwortliche best\u00e4tigen",owner:"Sonja + Julia C."},
+      {id:"a9",text:"Zahlungsart entscheiden: SumUp, Voba-Leihger\u00e4te oder WERO",owner:"Veronika und Gina"},
+      {id:"a15",text:"Abrechnung: Ablauf und Verantwortliche best\u00e4tigen",owner:"Sonja + Julia C. + Julia K."},
     ]},
     {id:"g_a5",title:"MATERIAL",bullet:"Kennzeichnung Orgateam: Buttons vs. Schal vs. weitere",todos:[
-      {id:"a10",text:"Kennzeichnung Orgateam entscheiden: Buttons vs. Schal vs. weitere",owner:"Laura"},
+      {id:"a10",text:"Schal als Kennzeichen f\u00fcr Orga \u2013 Laura bestellt mintfarbene Schals",owner:"Laura"},
     ]},
    ],
    table:{title:"Aufgabenverteilung H/W 2026",sub:"Aus FS26 \u00fcbernommen \u2013 bitte anpassen und best\u00e4tigen",
@@ -179,8 +184,9 @@ const PHASES = [
     {id:"g_j1",title:"VERK\u00c4UFER",bullet:"Basarlino-Regeln \u00fcberarbeiten \u00b7 Erinnerungsmail versenden \u00b7 E-Mail als Pflichtfeld pr\u00fcfen",todos:[
       {id:"j1",text:"Regeln f\u00fcr Basarlino \u00fcberarbeiten",owner:"Alle"},
       {id:"j2",text:"Hinweis auf Eigenverantwortung der Verk\u00e4ufer in Regeln aufnehmen",owner:"Julia C."},
-      {id:"j3",text:"Erinnerungsmail an bestehende Verk\u00e4ufer versenden",owner:"Julia C."},
+      {id:"j3",text:"Erinnerungsmail versenden (mind. 11. Jul. 2026; neue Nummernvergabe 18. Jul.)",owner:"Julia C."},
       {id:"j7",text:"Externe Helfer: E-Mail als Pflichtfeld in Basarlino pr\u00fcfen",owner:"Julia C."},
+      {id:"j10",text:"Erinnerungsmail an Verk\u00e4ufer mind. 2 Wochen vorher",owner:"Julia C."},
     ]},
     {id:"g_j2",title:"\u00d6FFENTLICHKEIT",bullet:"Plakate drucken \u00b7 Plakate verteilen \u00b7 Social Media / Presse ansto\u00dfen",todos:[
       {id:"j4",text:"Plakate drucken",owner:"Julia K."},
@@ -279,21 +285,21 @@ const PHASES = [
    summary:"Do: Minigolf/Bunker \u00b7 Fr: Aufbau \u00b7 So: B\u00f6rse + Nachbesprechung",
    groups:[
     {id:"g_b1",title:"DONNERSTAG AUFBAU",bullet:"Minigolf \u00b7 Bunker",todos:[
-      {id:"b1",text:"Minigolf aufgebaut",owner:"Pia (Sprinter)"},
-      {id:"b2",text:"Bunker aufgebaut",owner:"Laura (Sprinter)"},
+      {id:"b1",text:"Minigolf Bierzelt aufgebaut",owner:"Pia (Sprinter)"},
+      {id:"b2",text:"Bunker Bierzelt und Kiste aufgebaut",owner:"Laura (Sprinter)"},
     ]},
     {id:"g_b2",title:"FREITAG AUFBAU",bullet:"14:30 Orgateam \u00b7 14:45 M\u00e4nner \u00b7 16:00 Hauptaufbau + K\u00f6rbe \u00b7 18:30 Helfershoppen",todos:[
       {id:"b3",text:"Fr 14:30: Orgateam vollst\u00e4ndig",owner:"Alle"},
-      {id:"b4",text:"Fr 14:45: Aufbau M\u00e4nner gestartet",owner:"4 FL + 4 Helfer"},
+      {id:"b4",text:"Fr 15:00: Aufbau M\u00e4nner gestartet",owner:"4 FL + 4 Helfer"},
       {id:"b5",text:"Fr 16:00: Aufbau Freitag gestartet",owner:"22 Helfer"},
       {id:"b6",text:"Fr 16:00: K\u00f6rbe-Annahme l\u00e4uft",owner:"Denise + Sonja"},
       {id:"b7",text:"Fr 18:30: Helfershoppen ge\u00f6ffnet",owner:"Alle"},
     ]},
     {id:"g_b3",title:"SONNTAG B\u00d6RSE",bullet:"8:45 Orgateam \u00b7 9:00 Cafeteria \u00b7 9:15 Schwangerenshoppen \u00b7 9:30 Kuchen \u00b7 10:00 Verkauf \u00b7 12:30 Aufr\u00e4umen \u00b7 14:00 Abbau \u00b7 15:30 K\u00f6rbe",todos:[
       {id:"b8",text:"So 8:45: Orgateam vor Ort",owner:"Alle"},
-      {id:"b9",text:"So 9:00: Cafeteria bereit",owner:"Tanja + Mia"},
-      {id:"b10",text:"So 9:15: Schwangerenshoppen ge\u00f6ffnet",owner:"Julia C."},
-      {id:"b11",text:"So 9:30: Kuchenspenden-Annahme",owner:"25 Spenden"},
+      {id:"b9",text:"So 9:00: Cafeteria Aufbau bereit",owner:"Tanja + Mia"},
+      {id:"b10",text:"So 9:30: Schwangerenshoppen ge\u00f6ffnet",owner:"Julia C."},
+      {id:"b11",text:"So 9:00: Kuchenspenden-Annahme",owner:"25 Spenden"},
       {id:"b12",text:"So 10:00: Verkauf ge\u00f6ffnet",owner:"8 Helfer"},
       {id:"b13",text:"So 12:30: Aufr\u00e4umen gestartet",owner:"18 Helfer"},
       {id:"b14",text:"So 15:30: K\u00f6rbe-Abholung",owner:"Alle"},
@@ -328,11 +334,13 @@ const PHASES = [
 // \u2500\u2500 State \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const S = { view:"overview", activeId:null, todos:{}, groups:{}, notes:{}, tableRows:{} };
 
+const DONE_IDS = new Set(["a2","a3","a4","a6","a13","a14","a15"]);
+
 PHASES.forEach(p => {
   S.notes[p.id] = "";
-  S.groups[p.id] = p.groups.map(g => ({ ...g, todos: g.todos.map(t => ({ ...t, done: false })) }));
+  S.groups[p.id] = p.groups.map(g => ({ ...g, todos: g.todos.map(t => ({ ...t, done: DONE_IDS.has(t.id) })) }));
   if (p.table) S.tableRows[p.id] = p.table.rows.map(r => [...r]);
-  p.groups.forEach(g => g.todos.forEach(t => { S.todos[t.id] = false; }));
+  p.groups.forEach(g => g.todos.forEach(t => { S.todos[t.id] = DONE_IDS.has(t.id); }));
 });
 
 // \u2500\u2500 Helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -343,7 +351,31 @@ function getProgress(pid) { const all = getTodos(pid); const done = all.filter(t
 function globalProg() { let d=0,t=0; PHASES.forEach(p => { const pr=getProgress(p.id); d+=pr.done; t+=pr.total; }); return {done:d,total:t}; }
 function updateCounter() { const g=globalProg(); document.getElementById("global-counter").textContent=g.done+"/"+g.total+" Aufgaben erledigt"; }
 
+const LS_KEY = "kleiderborse_hw2026";
+function save() { try { localStorage.setItem(LS_KEY, JSON.stringify({todos:S.todos,groups:S.groups,notes:S.notes,tableRows:S.tableRows})); } catch(e) {} }
+function load() { try { const r=localStorage.getItem(LS_KEY); if(!r) return; const d=JSON.parse(r); if(d.todos) Object.assign(S.todos,d.todos); if(d.notes) Object.assign(S.notes,d.notes); if(d.groups) Object.assign(S.groups,d.groups); if(d.tableRows) Object.assign(S.tableRows,d.tableRows); } catch(e) {} }
+function resetAll() { if(!confirm("Alle gespeicherten Daten zur\u00fccksetzen?")) return; localStorage.removeItem(LS_KEY); location.reload(); }
+
+load();
+
 // \u2500\u2500 Render Overview \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+function exportState() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    todos: S.todos,
+    groups: S.groups,
+    notes: S.notes,
+    tableRows: S.tableRows,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "kleiderborse_stand_" + new Date().toISOString().slice(0,10) + ".json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
 function renderOverview() {
   updateCounter();
   let html = '<div class="card"><div class="section-label">Zeitleiste</div>';
@@ -434,10 +466,10 @@ function renderDetail(pid) {
     html += `<div class="group-block">
       <div class="group-hdr" style="background:${phase.color}12">
         <input class="group-title-inp" style="color:${phase.color}" value="${esc(group.title)}"
-          onchange="S.groups['${pid}'][${gi}].title=this.value.toUpperCase()">
+          onchange="S.groups['${pid}'][${gi}].title=this.value.toUpperCase();save()">
         <span class="group-sep" style="color:${phase.color}">\u00b7</span>
         <input class="group-bullet-inp" value="${esc(group.bullet)}" placeholder="Agenda-Beschreibung\u2026"
-          onchange="S.groups['${pid}'][${gi}].bullet=this.value">
+          onchange="S.groups['${pid}'][${gi}].bullet=this.value;save()">
         <button class="group-rm" onclick="removeGroup('${pid}',${gi})">\u00d7</button>
       </div>
       <div class="todos-area" id="todos-${pid}-${gi}">`;
@@ -469,7 +501,7 @@ function renderDetail(pid) {
         } else {
           html += `<td ${isCat?'class="cat"':''}><input value="${esc(cell)}"
             style="${isCat?'color:#6C5CE7;font-weight:600;font-size:11px':''}"
-            onchange="S.tableRows['${pid}'][${ri}][${ci}]=this.value"></td>`;
+            onchange="S.tableRows['${pid}'][${ri}][${ci}]=this.value;save()"></td>`;
         }
       });
       html += `</tr>`;
@@ -483,7 +515,7 @@ function renderDetail(pid) {
     <div class="doc-label">Dokumentation</div>
     <textarea class="doc-ta" placeholder="Beschl\u00fcsse, Notizen, offene Punkte aus diesem Treffen\u2026"
       onfocus="this.style.borderColor='${phase.color}'" onblur="this.style.borderColor='#e8e4f3'"
-      onchange="S.notes['${pid}']=this.value">${esc(S.notes[pid])}</textarea>
+      onchange="S.notes['${pid}']=this.value;save()">${esc(S.notes[pid])}</textarea>
   </div></div>`;
 
   document.getElementById("app").innerHTML = html;
@@ -495,6 +527,7 @@ function openPhase(pid) { S.view="detail"; S.activeId=pid; renderDetail(pid); }
 
 function toggleTodo(pid, gi, ti, tid) {
   S.todos[tid] = !S.todos[tid];
+  save();
   const todo = S.groups[pid][gi].todos[ti];
   const color = PHASES.find(p=>p.id===pid).color;
   const row = document.getElementById("tr-"+tid);
@@ -519,7 +552,7 @@ function editText(pid, gi, ti, tid) {
   inp.value = todo.text;
   span.replaceWith(inp);
   inp.focus();
-  const commit = () => { todo.text = inp.value; renderDetail(pid); };
+  const commit = () => { todo.text = inp.value; save(); renderDetail(pid); };
   inp.onblur = commit;
   inp.onkeydown = e => { if (e.key==="Enter"||e.key==="Escape") commit(); };
 }
@@ -537,7 +570,7 @@ function editOwner(pid, gi, ti, tid) {
   inp.placeholder = "Owner eingeben\u2026";
   pill.replaceWith(inp);
   inp.focus();
-  const commit = () => { todo.owner = inp.value; renderDetail(pid); };
+  const commit = () => { todo.owner = inp.value; save(); renderDetail(pid); };
   inp.onblur = commit;
   inp.onkeydown = e => { if (e.key==="Enter"||e.key==="Escape") commit(); };
 }
@@ -546,14 +579,14 @@ function deleteTodo(pid, gi, ti) {
   const todo = S.groups[pid][gi].todos[ti];
   delete S.todos[todo.id];
   S.groups[pid][gi].todos.splice(ti, 1);
-  renderDetail(pid);
+  save(); renderDetail(pid);
 }
 
 function addTodo(pid, gi) {
   const id = "t_" + Date.now();
   S.todos[id] = false;
   S.groups[pid][gi].todos.push({ id, text: "", owner: "" });
-  renderDetail(pid);
+  save(); renderDetail(pid);
   setTimeout(() => {
     const todos = S.groups[pid][gi].todos;
     editText(pid, gi, todos.length-1, todos[todos.length-1].id);
@@ -563,18 +596,18 @@ function addTodo(pid, gi) {
 function removeGroup(pid, gi) {
   S.groups[pid][gi].todos.forEach(t => delete S.todos[t.id]);
   S.groups[pid].splice(gi, 1);
-  renderDetail(pid);
+  save(); renderDetail(pid);
 }
 
 function addGroup(pid) {
   S.groups[pid].push({ id:"g_"+Date.now(), title:"NEUES THEMA", bullet:"", todos:[] });
-  renderDetail(pid);
+  save(); renderDetail(pid);
 }
 
 function addTableRow(pid) {
   const phase = PHASES.find(p=>p.id===pid);
   S.tableRows[pid].push(phase.table.cols.map(()=>""));
-  renderDetail(pid);
+  save(); renderDetail(pid);
 }
 
 // \u2500\u2500 Init \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
